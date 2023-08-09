@@ -21,13 +21,12 @@ $upper_limit = $average + ($z * $deviation);
 $lower_limit = $average - ($z * $deviation);
 
 $remove = mysqli_query($conn, "SELECT * FROM glucose_tbl WHERE pt_id=$pt_id ORDER BY rec_id DESC limit 2000");
-$row_remove = mysqli_fetch_all($remove, MYSQLI_ASSOC);
+$original_data = mysqli_fetch_all($remove, MYSQLI_ASSOC);
 
 $graph_data = array_map(function ($data) use ($upper_limit, $lower_limit) {
   $winsorizing = array_merge(array(), $data);
 
   if ($winsorizing['bg_level'] > $upper_limit) {
-    echo $winsorizing['bg_level'] . " ";
     $winsorizing['bg_level'] = $upper_limit;
   }
 
@@ -36,14 +35,20 @@ $graph_data = array_map(function ($data) use ($upper_limit, $lower_limit) {
   }
 
   return $winsorizing;
-}, $row_remove);
+}, $original_data);
 
 
 
-$entry_bg = "";
+$before_data = "";
+
+foreach ($original_data as $row) {
+  $before_data .= "['" . $row["date_time"] . "'," . $row["bg_level"] . "," . $lower_limit . "," . $upper_limit . "," . $average . ",],";
+}
+
+$after_data = "";
 
 foreach ($graph_data as $row) {
-  $entry_bg .= "['" . $row["date_time"] . "'," . $row["bg_level"] . "," . $lower_limit . "," . $upper_limit . "," . $average . ",],";
+  $after_data .= "['" . $row["date_time"] . "'," . $row["bg_level"] . "," . $lower_limit . "," . $upper_limit . "," . $average . ",],";
 }
 
 ?>
@@ -63,10 +68,17 @@ foreach ($graph_data as $row) {
     <div class="card-body">
 
       <?php
-      if ($entry_bg != '') {
+      if ($before_data && $after_data) {
       ?>
 
-        <div id="chart_bg" style="width: 100%; height: 400px;"></div>
+        <div class="mb-5">
+          <h2 class="h4 mb-2 text-gray-800">Before</h2>
+          <div id="chart_before" style="width: 100%; height: 400px;"></div>
+        </div>
+        <div>
+          <h2 class="h4 mb-2 text-gray-800">After</h2>
+          <div id="chart_after" style="width: 100%; height: 400px;"></div>
+        </div>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
           google.load("visualization", "1", {
@@ -75,9 +87,13 @@ foreach ($graph_data as $row) {
           google.setOnLoadCallback(drawChart);
 
           function drawChart() {
-            var data = google.visualization.arrayToDataTable([
+            var dataBefore = google.visualization.arrayToDataTable([
               ['Date Time', 'Blood Glucose', 'Lower Limit', 'Uppper Limit', 'Average'],
-              <?php echo $entry_bg ?>
+              <?php echo $before_data ?>
+            ]);
+            var dataAfter = google.visualization.arrayToDataTable([
+              ['Date Time', 'Blood Glucose', 'Lower Limit', 'Uppper Limit', 'Average'],
+              <?php echo $after_data ?>
             ]);
             var options = {
               title: '',
@@ -137,11 +153,13 @@ foreach ($graph_data as $row) {
               }
             };
 
-            var chart = new google.visualization.LineChart(document.getElementById('chart_bg'));
-            chart.draw(data, options);
-
-            setInterval(drawChart, 5000);
+            var chartBefore = new google.visualization.LineChart(document.getElementById('chart_before'));
+            var chartAfter = new google.visualization.LineChart(document.getElementById('chart_after'));
+            chartBefore.draw(dataBefore, options);
+            chartAfter.draw(dataAfter, options);
           }
+
+          drawChart()
         </script>
 
       <?php
