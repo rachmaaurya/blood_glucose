@@ -14,15 +14,66 @@ $mean = mysqli_query($conn, "SELECT AVG(bg_level) AS average FROM new_glucose WH
 $row_mean = mysqli_fetch_assoc($mean);
 $average = $row_mean["average"];
 
-//menghitung standar deviasi
-$std = mysqli_query($conn, "SELECT STDDEV(bg_level) AS deviation FROM new_glucose WHERE pt_id=$pt_id");
-$row_std = mysqli_fetch_assoc($std);
-$deviation = $row_std["deviation"];
+//IQR
+$query_data_urut = "SELECT * FROM glucose_tbl WHERE pt_id=$pt_id ORDER BY bg_level";
+$hasil_query = mysqli_query($conn, $query_data_urut);
+$data_urut = mysqli_fetch_all($hasil_query, MYSQLI_ASSOC);
+$total_data_urut = count($data_urut);
 
-//menghitung 3-sigma
-$z = 3;
-$upper_limit = $average + ($z * $deviation);
-$lower_limit = $average - ($z * $deviation);
+// echo $data_habis ?"data habis" : "data tidak habis";
+// echo $data_genap ?"data genap" : "data ganjil";
+// echo strval($data_genap );
+// echo '<br>';
+// echo $total_data_urut;
+
+function cari_quartile($q, $data){
+  $banyak_data = count($data);
+  $data_genap = $banyak_data % 2 == 0;
+  $data_habis = ($banyak_data + 1) % 4 == 0;
+
+  if ($data_genap){
+    if ($data_habis){
+      if ($q == 1){
+        return ($data[(($banyak_data - 1) / 4) - 1]['bg_level'] + $data[(($banyak_data + 3) / 4) - 1]['bg_level']) / 2;
+      } elseif ($q == 3) {
+        return ($data[((3 * $banyak_data + 1) / 4) - 1]['bg_level'] + $data[((3 * $banyak_data + 5) / 4) - 1]['bg_level']) / 2;
+      }
+    } else{
+      if ($q == 1){
+        return $data[(($banyak_data + 2) / 4) - 1]['bg_level'];
+      } elseif ($q == 3) {
+        return $data[((3 * $banyak_data + 2) / 4) - 1]['bg_level'];
+      }
+    }
+  } else{
+    if ($data_habis){
+      if ($q == 1){
+        return $data[(($banyak_data + 1) / 4) - 1]['bg_level'];
+      } elseif ($q == 3) {
+        return $data[((3 * ($banyak_data + 1)) / 4) - 1]['bg_level'];
+      }
+    } else{
+      if ($q == 1){
+        return ($data[(($banyak_data - 1) / 4) - 1]['bg_level'] + $data[(($banyak_data + 3) / 4) - 1]['bg_level']) / 2;
+      } elseif ($q == 3) {
+        return ($data[((3 * $banyak_data + 1) / 4) - 1]['bg_level'] + $data[((3 * $banyak_data + 5) / 4) - 1]['bg_level']) / 2;
+      }
+    }
+  }
+}
+
+// var_dump($data_urut);
+// echo cari_quartile(1, $data_urut);
+// echo '<br>';
+// echo cari_quartile(3, $data_urut);
+
+$q1 = cari_quartile(1, $data_urut);
+$q3 = cari_quartile(3, $data_urut);
+$iqr = $q3 - $q1;
+
+//menghitung IQR
+$upper_limit = $average + $iqr;
+$lower_limit = $average - $iqr;
 
 //mengambil data outlier untuk ditampilkan di dalam tabel
 $data1 = "SELECT * FROM glucose_tbl WHERE pt_id=$pt_id and (bg_level<$lower_limit OR bg_level>$upper_limit)";
@@ -38,7 +89,7 @@ $total_data2 = mysqli_num_rows($data2);
 
 
   <!-- Page Heading -->
-  <h1 class="h3 mb-2 text-gray-800">Data Outlier Blood Glucose Level of Patient ID : <?php echo "$pt_id"; ?> using 3-Sigma</h1>
+  <h1 class="h3 mb-2 text-gray-800">Data Outlier Blood Glucose Level of Patient ID : <?php echo "$pt_id"; ?> using IQR</h1>
   
   <!-- DataTales Example -->
   <div class="card shadow mb-4">

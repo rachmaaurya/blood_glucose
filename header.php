@@ -8,6 +8,7 @@ $result1 = mysqli_query($conn, $sql);
 $result2 = mysqli_query($conn, $sql);
 $result3 = mysqli_query($conn, $sql);
 $result4 = mysqli_query($conn, $sql);
+$result5 = mysqli_query($conn, $sql);
 $total_data = mysqli_num_rows($result1);
 
 
@@ -77,7 +78,7 @@ $total_data = mysqli_num_rows($result1);
       <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTemphum" aria-expanded="true" aria-controls="collapseTemphum">
           <i class="fas fa-fw fa-chart-area"></i>
-          <span>Visualization Outlier</span>
+          <span>Visualization 3-Sigma</span>
         </a>
           <div id="collapseTemphum" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
@@ -94,11 +95,11 @@ $total_data = mysqli_num_rows($result1);
       </li>
        <!-- Divider -->
        <!-- Divider -->
-      <!-- <hr class="sidebar-divider">
+      <hr class="sidebar-divider">
       <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseExample" aria-expanded="true" aria-controls="collapseExample">
           <i class="fas fa-fw fa-chart-area"></i>
-          <span>New Visualization</span>
+          <span>Visualization IQR</span>
         </a>
           <div id="collapseExample" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
@@ -106,20 +107,20 @@ $total_data = mysqli_num_rows($result1);
             <?php
             while($row3 = mysqli_fetch_assoc($result3)) {
 
-              echo"<a class='collapse-item' href='?page=newGraphView&pt_id=".$row3["pt_id"]."'>Patient ".$row3["pt_id"]. "</a>";
+              echo"<a class='collapse-item' href='?page=graphView2&pt_id=".$row3["pt_id"]."'>Patient ".$row3["pt_id"]. "</a>";
               }
             ?>
             
           </div>
         </div>
-      </li> -->
+      </li>
        <!-- Divider -->
        <!-- Divider -->
       <hr class="sidebar-divider">
       <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
           <i class="fas fa-list-alt"></i>
-          <span>Data Outlier</span>
+          <span>Data Outlier 3-Sigma</span>
         </a>
           <div id="collapseOne" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
@@ -136,6 +137,27 @@ $total_data = mysqli_num_rows($result1);
       </li>
        <!-- Divider -->
        <!-- Divider -->
+       <hr class="sidebar-divider">
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+          <i class="fas fa-list-alt"></i>
+          <span>Data Outlier IQR</span>
+        </a>
+          <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+
+            <?php
+            while($row5 = mysqli_fetch_assoc($result5)) {
+
+              echo"<a class='collapse-item' href='?page=dataOutlier2&pt_id=".$row5["pt_id"]."'>Patient ".$row5["pt_id"]. "</a>";
+              }
+            ?>
+            
+          </div>
+        </div>
+      </li>
+
+
       <hr class="sidebar-divider">
 
     </ul>

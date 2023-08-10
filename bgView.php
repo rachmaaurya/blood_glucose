@@ -17,9 +17,9 @@ $total_data = mysqli_num_rows($result);
 
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
-            <!-- <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">History of Blood Glucose Level</h6>
-            </div> -->
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Total Data : <?php echo $total_data; ?></h6>
+            </div>
             <div class="card-body">
 
 
