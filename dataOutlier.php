@@ -10,12 +10,12 @@ $result = mysqli_query($conn, $sql);
 $total_data = mysqli_num_rows($result);
 
 //menghitung rata-rata
-$mean = mysqli_query($conn, "SELECT AVG(bg_level) AS average FROM new_glucose WHERE pt_id=$pt_id");
+$mean = mysqli_query($conn, "SELECT AVG(bg_level) AS average FROM glucose_tbl WHERE pt_id=$pt_id and (bg_level!=0)");
 $row_mean = mysqli_fetch_assoc($mean);
 $average = $row_mean["average"];
 
 //menghitung standar deviasi
-$std = mysqli_query($conn, "SELECT STDDEV(bg_level) AS deviation FROM new_glucose WHERE pt_id=$pt_id");
+$std = mysqli_query($conn, "SELECT STDDEV(bg_level) AS deviation FROM glucose_tbl WHERE pt_id=$pt_id and (bg_level!=0)");
 $row_std = mysqli_fetch_assoc($std);
 $deviation = $row_std["deviation"];
 
@@ -44,8 +44,8 @@ $total_data2 = mysqli_num_rows($data2);
   <div class="card shadow mb-4">
     <div class="card-header py-3">
       <h6 class="m-0 font-weight-bold text-primary">Total Data : <?php echo $total_data; ?></h6>
-      <h6 class="m-0 font-weight-bold text-primary">Batas Atas : <?php echo $upper_limit; ?></h6>
-      <h6 class="m-0 font-weight-bold text-primary">Batas Bawah : <?php echo $lower_limit; ?></h6>
+      <h6 class="m-0 font-weight-bold text-primary">Upper Limit : <?php echo $upper_limit; ?></h6>
+      <h6 class="m-0 font-weight-bold text-primary">Lower Limit : <?php echo $lower_limit; ?></h6>
       <h6 class="m-0 font-weight-bold text-primary">Total Data Outlier : <?php echo $total_data2; ?></h6>
       
     </div>
@@ -57,7 +57,7 @@ $total_data2 = mysqli_num_rows($data2);
           <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
             <thead>
               <tr class="table-success">
-                <th>Patient ID</th>
+                <th >Patient ID</th>
                 <th>Date Time</th>
                 <th>Blood Glucose Level (mg/dL)</th>
               </tr>

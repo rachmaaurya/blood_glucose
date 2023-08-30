@@ -83,7 +83,7 @@
               </div>
               <form class="user" action="" method="post">
                 <div class="form-group">
-                    <input type="text" class="form-control" name="name" id="name" placeholder="<?=$lang['fullname']?>" required>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="<?=$lang['name']?>" required>
                 </div>
                 <div class="form-group">
                   <input type="email" class="form-control" name="email" id="email" placeholder="<?=$lang['email']?>" required>

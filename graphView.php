@@ -10,12 +10,12 @@ $result = mysqli_query($conn, $sql);
 $total_data = mysqli_num_rows($result);
 
 //menghitung rata-rata
-$mean = mysqli_query($conn, "SELECT AVG(bg_level) AS average FROM new_glucose WHERE pt_id=$pt_id");
+$mean = mysqli_query($conn, "SELECT AVG(bg_level) AS average FROM glucose_tbl WHERE pt_id=$pt_id and (bg_level!=0)");
 $row_mean = mysqli_fetch_assoc($mean);
 $average = $row_mean["average"];
 
 //menghitung standar deviasi
-$std = mysqli_query($conn, "SELECT STDDEV(bg_level) AS deviation FROM new_glucose WHERE pt_id=$pt_id");
+$std = mysqli_query($conn, "SELECT STDDEV(bg_level) AS deviation FROM glucose_tbl WHERE pt_id=$pt_id and (bg_level!=0)");
 $row_std = mysqli_fetch_assoc($std);
 $deviation = $row_std["deviation"];
 
@@ -24,13 +24,14 @@ $z = 3;
 $upper_limit = $average + ($z * $deviation);
 $lower_limit = $average - ($z * $deviation);
 
-//hasil data berupa asosiatif array
+//winsorizing
+//mengambil data agar berbentuk asosiatif array
 $original_data = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-//winsorizing
-//
+//proses satu array agar bisa dipakai arraynya ke array baru
+//data yang berbentuk asosiatif array diwakili oleh variabel data,
 $graph_data = array_map(function ($data) use ($upper_limit, $lower_limit) {
-  $winsorizing = array_merge(array(), $data);
+  $winsorizing = array_merge(array(), $data); //mematenkan array
 
   if ($winsorizing['bg_level'] > $upper_limit) {
     $winsorizing['bg_level'] = $upper_limit;
@@ -44,14 +45,14 @@ $graph_data = array_map(function ($data) use ($upper_limit, $lower_limit) {
 }, $original_data);
 
 
-//
+//data yang dipanggil untuk graph sebelum winsorizing
 $before_data = "";
 
 foreach ($original_data as $row) {
   $before_data .= "['" . $row["date_time"] . "'," . $row["bg_level"] . "," . $lower_limit . "," . $upper_limit . "," . $average . ",],";
 }
 
-//
+//data yang dipanggil untuk graph setelah winsorizing
 $after_data = "";
 
 foreach ($graph_data as $row) {
@@ -70,7 +71,7 @@ foreach ($graph_data as $row) {
   <!-- DataTales Example -->
   <div class="card shadow mb-4">
     <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">Outlier Detection with 3 Sigma</h6>
+      <h6 class="m-0 font-weight-bold text-primary">Outlier Detection using 3-Sigma</h6>
     </div>
     <div class="card-body">
 
@@ -79,11 +80,11 @@ foreach ($graph_data as $row) {
       ?>
 
         <div class="mb-5">
-          <h2 class="h4 mb-2 text-gray-800">Before Winsorizing</h2>
+          <h2 class="h4 mb-2 text-gray-800">Original Data</h2>
           <div id="chart_before" style="width: 100%; height: 400px;"></div>
         </div>
         <div>
-          <h2 class="h4 mb-2 text-gray-800">After Winsorizing</h2>
+          <h2 class="h4 mb-2 text-gray-800">After Corrected</h2>
           <div id="chart_after" style="width: 100%; height: 400px;"></div>
         </div>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>

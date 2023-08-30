@@ -10,11 +10,12 @@ $result = mysqli_query($conn, $sql);
 $total_data = mysqli_num_rows($result);
 
 //menghitung rata-rata
-$mean = mysqli_query($conn, "SELECT AVG(bg_level) AS average FROM new_glucose WHERE pt_id=$pt_id");
+$mean = mysqli_query($conn, "SELECT AVG(bg_level) AS average FROM glucose_tbl WHERE pt_id=$pt_id and (bg_level!=0)");
 $row_mean = mysqli_fetch_assoc($mean);
 $average = $row_mean["average"];
 
 //IQR
+//mengambil data dengan urutan angka kecil ke angka besar
 $query_data_urut = "SELECT * FROM glucose_tbl WHERE pt_id=$pt_id ORDER BY bg_level";
 $hasil_query = mysqli_query($conn, $query_data_urut);
 $data_urut = mysqli_fetch_all($hasil_query, MYSQLI_ASSOC);
@@ -26,6 +27,7 @@ $total_data_urut = count($data_urut);
 // echo '<br>';
 // echo $total_data_urut;
 
+//menghitung nilai q1 dan q3
 function cari_quartile($q, $data){
   $banyak_data = count($data);
   $data_genap = $banyak_data % 2 == 0;
@@ -67,11 +69,12 @@ function cari_quartile($q, $data){
 // echo '<br>';
 // echo cari_quartile(3, $data_urut);
 
+//menghitung IQR
 $q1 = cari_quartile(1, $data_urut);
 $q3 = cari_quartile(3, $data_urut);
 $iqr = $q3 - $q1;
 
-//menghitung IQR
+//menghitung batas IQR
 $upper_limit = $average + $iqr;
 $lower_limit = $average - $iqr;
 
@@ -95,8 +98,8 @@ $total_data2 = mysqli_num_rows($data2);
   <div class="card shadow mb-4">
     <div class="card-header py-3">
       <h6 class="m-0 font-weight-bold text-primary">Total Data : <?php echo $total_data; ?></h6>
-      <h6 class="m-0 font-weight-bold text-primary">Batas Atas : <?php echo $upper_limit; ?></h6>
-      <h6 class="m-0 font-weight-bold text-primary">Batas Bawah : <?php echo $lower_limit; ?></h6>
+      <h6 class="m-0 font-weight-bold text-primary">Upper LImit : <?php echo $upper_limit; ?></h6>
+      <h6 class="m-0 font-weight-bold text-primary">Lower Limit: <?php echo $lower_limit; ?></h6>
       <h6 class="m-0 font-weight-bold text-primary">Total Data Outlier : <?php echo $total_data2; ?></h6>
       
     </div>

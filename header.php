@@ -23,7 +23,7 @@ $total_data = mysqli_num_rows($result1);
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title><?=$lang['title']?> - <?=$lang['dashboard']?></title>
+  <title><?=$lang['title']?> Monitoring System</title>
 
   <!-- Custom fonts for this template-->
   <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -175,7 +175,7 @@ $total_data = mysqli_num_rows($result1);
             <i class="fa fa-bars"></i>
           </button>
 
-
+          
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
 

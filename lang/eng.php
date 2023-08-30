@@ -13,6 +13,7 @@ $lang['haveaccount']	= 'Already have an account?';
 $lang['loginhere']	= 'Login here';
 $lang['dashboard']	= 'Dashboard';
 $lang['company']	= 'Company name';
+
 //register
 $lang['email']		= 'Email Address';
 $lang['password']	= 'Password';
